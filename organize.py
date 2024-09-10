@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-import shutil
+from shutil import move
 
 file_extension_map = {
     'pdf'   : 'Report',
@@ -18,16 +18,14 @@ file_extension_map = {
 }
 
 def organize(folder_input):
-    folder = folder_input.get()
+    os.chdir(folder_input.get())
     folder_input.delete(0, tk.END)
     
-    generate_folders(folder)
+    generate_folders()
     move_files()
     remove_unused_folders()
 
-def generate_folders(folder):
-    os.chdir(folder)
-
+def generate_folders():
     for f in set(file_extension_map.values()):
         folder_path = f + '/'
         if not os.path.exists(folder_path):
@@ -35,18 +33,17 @@ def generate_folders(folder):
 
 def move_files():
     all_files = os.listdir()
-    possible_extensions = set(file_extension_map.keys())
 
     for f in all_files:
         if not os.path.isfile(f): 
             continue
 
         file_name, file_extension = f.split('.')
-        if file_extension not in possible_extensions:
+        if file_extension not in file_extension_map:
             continue
 
         folder_destination = file_extension_map[file_extension]
-        shutil.move(f, folder_destination)
+        move(f, folder_destination)
 
 def remove_unused_folders():
     folders = [f for f in os.listdir() if os.path.isdir(f)]
